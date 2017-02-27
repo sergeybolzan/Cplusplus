@@ -1,0 +1,125 @@
+﻿#include "stdafx.h"
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <algorithm>
+class TN
+{
+protected:
+	double m_value;
+	TN* m_left = nullptr;
+	TN* m_right = nullptr;
+public:
+	void SetValue(double arg)
+	{
+		m_value = arg;
+	}
+	void SetLeft(TN* arg)
+	{
+		m_left = arg;
+	}
+	void SetRight(TN* arg)
+	{
+		m_right = arg;
+	}	
+	double GetValue()
+	{
+		return m_value;
+	}
+	TN* GetLeft()
+	{
+		return m_left;
+	}
+	TN* GetRight()
+	{
+		return m_right;
+	}
+};
+size_t Count(const std::vector<double>& arg) //Возвращает размер необходимого дерева
+{
+	size_t n = arg.size();
+	auto result = n;
+	if (0 == n) return 0;
+	while (n != 1)
+	{
+		n = (n + 1) / 2;
+		result += n;
+	}
+}
+void ConsoleOut(TN *Tree) //Вывод дерева на экран
+{
+	if (Tree != NULL)
+	{
+		ConsoleOut(Tree->GetRight());
+		std::cout << Tree->GetValue() << " ";
+		ConsoleOut(Tree->GetLeft());
+	}
+}
+std::shared_ptr<TN> BuildTree(std::vector<double>& asrc) //Функция, возвращающая дерево, на нижний уровень которого ложится начальный вектор
+{
+	std::sort(asrc.begin(), asrc.end()); //Сортировка вектора
+	const auto nSize = Count(asrc);
+	std::shared_ptr<TN> v_ret(new TN[nSize], [](TN* p){delete[]p; }); //Создание дерева необходимого размера
+
+	TN* pData = v_ret.get();
+	TN* pEnd = pData + nSize;
+	TN* pStart = pEnd - asrc.size();
+
+	auto it = std::begin(asrc);
+	std::for_each(pStart, pEnd, [&it](TN& vTN){vTN.SetValue(*it); ++it; });
+
+	auto level_up = (asrc.size() + 1) / 2; //Размер следующего уровня
+	TN* firstOfLevelDown;
+	TN* temp;
+	TN *check;
+	while (pStart != pData)
+	{
+		firstOfLevelDown = pEnd;
+		temp = pStart;
+		pEnd = pStart;
+		pStart = pStart - level_up;
+		level_up = (level_up + 1) / 2;
+		std::for_each(pStart, pEnd, [&](TN& vTN){
+			if ((temp + 1) != firstOfLevelDown)
+			{
+				vTN.SetValue((temp->GetValue() + (temp + 1)->GetValue()) / 2);
+				vTN.SetLeft(temp);
+				vTN.SetRight(temp + 1);
+				temp += 2;
+			}
+			else
+			{
+				vTN.SetValue(temp->GetValue() + 1);
+				vTN.SetLeft(temp);
+			}
+			if (vTN.GetLeft()->GetRight() != NULL)
+			{
+				check = vTN.GetLeft()->GetRight();
+				do
+				{
+					if (check->GetValue() >= vTN.GetValue())	vTN.SetValue(check->GetValue() + 0.5);
+					check = check->GetRight();
+				} while (check != NULL);
+			}
+			if (vTN.GetRight() != NULL)
+			if (vTN.GetRight()->GetLeft() != NULL)
+			{
+				check = vTN.GetRight()->GetLeft();
+				do
+				{
+					if (check->GetValue() <= vTN.GetValue())	vTN.SetValue(check->GetValue() - 0.5);
+					check = check->GetLeft();
+				} while (check != NULL);
+			}
+		});
+	}
+
+	return v_ret;
+}
+void main()
+{
+	std::vector<double> vec{ 45., 7., 51., 58., 71., 1., 19., 64., 32., 40., 25. };
+	std::shared_ptr<TN> tree = BuildTree(vec);
+	ConsoleOut(tree.get());
+	std::cout << std::endl << Count(vec) << std::endl;
+}
