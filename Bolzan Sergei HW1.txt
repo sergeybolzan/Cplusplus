@@ -1,0 +1,251 @@
+Задание 1: 
+Создайте программу, имитирующую многоквартирный дом. Необходимо иметь классы “Человек”, “Квартира”, “Дом”. Класс “Квартира” содержит динамический массив объектов класса “Человек”. Класс “Дом” содержит массив объектов класса “Квартира”. Каждый из классов содержит переменные-члены и функции-члены, которые необходимы для предметной области класса. Обращаем ваше внимание, что память под строковые значения выделяется динамически. Например, для ФИО в классе “Человек”. Не забывайте обеспечить классы различными конструкторами (конструктор копирования обязателен), деструкторами. В main протестировать работу полученного набора классов.  
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class House
+{
+	char *namestreet = new char[20];
+	int number;
+public:
+	House() 
+	{
+		cout << "Constructor House\n";
+	}
+	House(const House& arg)
+	{
+		cout << "CopyConstructor House\n";
+	}
+	void SetHouse(int number, char* namestreet) 
+	{
+		this->number = number;
+		this->namestreet = namestreet;
+	}
+	char* GetHouseNamestreet() 
+	{
+		return namestreet;
+	}
+	int GetHouseNumber()
+	{
+		return number;
+	}
+	~House()
+	{
+		cout << "Destructor House\n";
+//		delete[] namestreet;
+	}
+};
+class Flat : public House
+{
+	int number;
+public:
+	void SetFlat(int number)
+	{
+		this->number = number;
+	}
+	int GetFlat()
+	{
+		return number;
+	}
+	Flat() {}
+	Flat(const Flat& arg){}
+};
+class Human : public Flat
+{
+	char *fio = new char[20];
+public:
+	Human() {}
+	Human(const Human& arg){}
+	~Human()
+	{
+		delete[] fio;
+	}
+};
+void main()
+{
+	House *house = new Flat[2];
+	Flat *flat = new Human[2];
+	house[0].SetHouse(55, "Kolasa");
+	cout << house[0].GetHouseNamestreet() << "\t" << house[0].GetHouseNumber() << "\n";
+	flat[0].SetFlat(11);
+	cout << flat[0].GetFlat() << "\n";
+	House dom = house[0];
+	cout << dom.GetHouseNamestreet() << "\t" << dom.GetHouseNumber() << "\n";
+	delete[] house;
+	delete[] flat;
+}
+
+Задание 2: 
+Разработать класс Reservoir (водоем). Класс должен обязательно иметь поле «название». Класс должен содержать: конструктор по умолчанию, конструктор с параметрами, при необходимости реализовать деструктор и конструктор копирования.
+Добавить методы для:
+1.	Определения приблизительного объема (ширина*длина*максимальная глубина)
+2.	Определения площади водной поверхности
+3.	Метод для проверки относятся ли водоемы к одному типу (море-море; бассейн-пруд)
+4.	Для сравнения площади водной поверхности водоемов одного типа
+5.	Для копирования объектов
+6.	Остальные методы на усмотрение разработчика (методы set и get)
+Написать интерфейс для работы с классом. Реализовать динамический массив объектов класса с возможностью добавления, удаления объектов из массива.
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Reservoir
+{
+private:
+	char *name;
+	char *type;
+	int width;
+	int length;
+	int depth;
+public:
+	Reservoir(){}
+	Reservoir(char *name, char *type, int width, int length, int depth)
+	{
+		this->name = name;
+		this->type = type;
+		this->width = width;
+		this->length = length;
+		this->depth = depth;
+	}
+//	Reservoir(const Reservoir& obj){}
+	void Set(char *name, char *type, int width, int length, int depth)
+	{
+		this->name = name;
+		this->type = type;
+		this->width = width;
+		this->length = length;
+		this->depth = depth;
+	}
+	void Get()
+	{
+		cout << name << " " << type << " " << width << " " << length << " " << depth << "\n";
+	}
+	int Volume()
+	{
+		return width*length*depth;
+	}
+	int Square()
+	{
+		return width*length;
+	}
+	void Check(Reservoir first, Reservoir second)
+	{
+		(first.type == second.type) ? cout << "One type reservoirs" << "\n" : cout << "Different types of reservoirs" << "\n";
+	}
+	void Compare(Reservoir first, Reservoir second)
+	{
+		cout << first.name << " square = " << first.Square() << "\t" << second.name << " square = " << second.Square() << "\n" << first.name << " square ";
+		if (first.Square() < second.Square()) cout << "< ";
+		else cout << "> ";
+		cout << second.name << " square\n";
+	}
+	Reservoir Copy(Reservoir obj)
+	{
+		Reservoir newobj = obj;
+		return newobj;
+	}
+};
+Reservoir *AddObj(Reservoir *obj, int size)
+{
+	Reservoir *new_obj = new Reservoir[size + 1];
+	for (int i = 0; i < size; ++i)
+	{
+		new_obj[i] = obj[i];
+	}
+	delete[] obj;
+	return obj = new_obj;
+}
+Reservoir *DeleteObj(Reservoir *obj, int size)
+{
+	Reservoir *new_obj = new Reservoir[size - 1];
+	for (int i = 0; i < size - 1; ++i)
+	{
+		new_obj[i] = obj[i];
+	}
+	delete[] obj;
+	return obj = new_obj;
+}
+
+void main()
+{
+	Reservoir naroch("Naroch", "lake", 5, 5, 1);
+	cout << naroch.Volume() << "\n";
+	Reservoir *water = new Reservoir[3];
+	water[0].Set("Black", "sea", 20, 30, 5);
+	water[1].Set("Baltic", "sea", 20, 20, 4);
+	water[0].Check(water[0], water[1]);
+	water[0].Check(water[0], naroch);
+	water[0].Compare(water[0], water[1]);
+	water[2] = water[2].Copy(water[0]);
+	water[2].Get();
+	water = AddObj(water, 3);
+	water[3].Set("Red", "sea", 15, 15, 3);
+	water[3].Get();
+	water = DeleteObj(water, 4);
+	water[2].Get();
+	delete[] water;
+}
+
+Задание 3: Разработать класс String, который в дальнейшем будет использоваться для работы со строками. Класс должен содержать: 
+Конструктор по умолчанию, позволяющий создать строку длиной 80 символов; 
+Конструктор, позволяющий создавать строку произвольного размера; 
+Конструктор, который создаёт строку и инициализирует её строкой, полученной от пользователя. 
+Необходимо создать деструктор, а также использовать механизмы делегирования конструкторов, если это возможно.
+Класс должен содержать методы для ввода строк с клавиатуры и вывода строк на экран.
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class String
+{
+	char *str;
+	int len;
+public:
+	String()
+	{
+		str = new char[80];
+	}
+	String(int lenght)
+	{
+		str = new char[lenght];
+	}
+	String(char *s)
+	{
+		len = strlen(s);
+		str = new char[len + 1];
+		strcpy(str, s);
+	}
+	String(const String& s)
+	{
+		len = s.len;
+		str = new char[len + 1];
+		strcpy(str, s.str);
+	}
+	~String()
+	{
+		delete[] str;
+	}
+	void Set()
+	{
+		char a[20];
+		cin.getline(a, 20);
+		int len = strlen(a) + 1;
+		str = new char[len];
+		strcpy(str, a);
+	}
+	char *Get()
+	{
+		return str;
+	}
+};
+
+void main()
+{
+	String stroka1;
+	String stroka2(100);
+	String stroka3("Hello");
+	cout << stroka3.Get();
+	stroka3.Set();
+	cout << stroka3.Get();
+}

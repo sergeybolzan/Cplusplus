@@ -1,0 +1,288 @@
+Задание 1. Создать базовый класс «Домашнее животное» и производные классы «Собака», «Кошка», «Попугай». 
+С помощью конструктора установить имя каждого животного и его характеристики.
+
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Pet
+{
+public:
+	char name[20];
+	double height;
+	double weight;
+	Pet(char *n, double h, double w){
+		strcpy_s(name, n);
+		height = h;
+		weight = w;
+	}
+	void ConsoleOut()
+	{
+		cout << name << "\tHeight: " << height << "\tWeight: " << weight << endl;
+	}
+};
+
+class Dog : public Pet
+{
+public:
+	Dog(char *n, double h, double w) : Pet(n, h, w){};
+};
+
+class Cat : public Pet
+{
+public:
+	Cat(char *n, double h, double w) : Pet(n, h, w){};
+};
+class Parrot : public Pet
+{
+public:
+	Parrot(char *n, double h, double w) : Pet(n, h, w){};
+};
+
+void main()
+{
+	Pet *animal[3] = { new Dog("Jack", 0.7, 10), new Cat("Tom", 0.3, 5), new Parrot("Gosha", 0.2, 3) };
+	for (int i = 0; i < 3; i++)	animal[i]->ConsoleOut();
+}
+
+
+
+
+
+
+
+Задание 2. 
+Описать базовый класс «Строка».
+Методы:
+1) конструктор без параметров;
+2) конструктор, принимающий в качестве параметра C-строку (заканчивается нулевым байтом);
+3) конструктор копирования;
+4) оператор присваивания;
+5) получение длины строки;
+6) очистка строки (сделать строку пустой);
+7) деструктор;
+8) конкатенация строк (перегрузить операторы + и +=);
+9) проверка на равенство (= =) и на неравенство (!=).
+
+Описать класс «Битовая строка» производный от класса «Строка» 
+(Строки данного класса могут содержать только символы ‘0’ и ‘1’). Если в основе инициализирующей строки встретятся любые символы, отличные от допустимых, то «Битовая строка» становится пустой. Содержимое строки рассматривается как двоичное представление целого числа со знаковым разрядом. Отрицательные числа хранятся в дополнительном коде.
+
+Методы:
+1) конструктор без параметров;
+2) конструктор, принимающий в качестве параметра C-строку;
+3) конструктор копирования;
+4) оператор присваивания;
+4) деструктор;
+5) изменение знака числа (перевод числа в дополнительный код).
+8) сложение битовых строк (перегрузить операторы + и +=);
+9) проверка на равенство (= =) и на неравенство (!=)
+
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class String
+{
+protected:
+	char *str;
+	int len;
+public:
+	String()
+	{
+		str = nullptr;
+		len = 0;
+	}
+	String(char *s)
+	{
+		len = strlen(s);
+		str = new char[len + 1];
+		strcpy_s(str, len + 1, s);
+	}
+	String(const String& s)
+	{
+		len = s.len;
+		str = new char[len + 1];
+		strcpy_s(str, len + 1, s.str);
+	}
+	String& operator=(const String& s)
+	{
+		len = s.len;
+		str = new char[len + 1];
+		strcpy_s(str, len + 1, s.str);
+		return *this;
+	}
+	int GetLen() //получение длины строки 
+	{
+		return strlen(str);
+	}
+	void Clear() //очистка строки (сделать строку пустой)
+	{
+		str[0] = '\0';
+		len = 0;
+	}
+	~String()
+	{
+		delete[] str;
+	}
+	String operator+(const String& s)
+	{
+		String temp;
+		temp.len = len + s.len;
+		temp.str = new char[temp.len + 1];
+		strcpy_s(temp.str, temp.len + 1, str);
+		strcat_s(temp.str, temp.len + 1, s.str);
+		return temp;
+	}
+	String& operator+=(const String& s)
+	{
+		*this = *this + s;
+		return *this;
+	}
+	bool operator==(const String& s)
+	{
+		return !strcmp(str, s.str);
+	}
+	bool operator!=(const String& s)
+	{
+		return !operator==(s);
+	}
+	friend ostream& operator<<(ostream&, String);
+};
+
+ostream& operator<<(ostream& stream, String s)
+{
+	stream << s.str;
+	return stream;
+}
+
+class BitString : public String
+{
+public:
+	BitString() : String(){};
+	BitString(char *s)
+	{
+		len = 8;
+		str = new char[len + 1];
+		int i;
+		for (i = 0; (i < 8) && (i < strlen(s)); i++)
+		if ((s[i] == '0') || (s[i] == '1'))	str[i] = s[i];
+		else 
+		{
+			str[0] = '\0';
+			len = 0;
+			break;
+		}
+		str[i] = '\0';
+		len = i;
+	}
+	BitString(const BitString& s) : String(s){}
+	BitString& operator=(const BitString& s)
+	{
+		String::operator=(s);
+		return *this;
+	}
+	~BitString(){}
+	BitString operator+(const BitString& s)
+	{
+		BitString temp;
+		temp.len = 8;
+		temp.str = new char[temp.len + 1];
+		int i;
+		for (i = 0; (i < strlen(str)) || (i < strlen(s.str)); i++)
+			temp.str[i] = str[i] | s.str[i];
+		temp.str[i] = '\0';
+		temp.len = i;
+		return temp;
+	}
+	BitString& operator+=(const BitString& s)
+	{
+		*this = *this + s;
+		return *this;
+	}
+};
+
+void main()
+{
+	BitString s1("01001");
+	cout << s1 << endl;
+	BitString s2("011100");
+	cout << s2 << endl;
+	BitString s3;
+	s3 = s1 + s2;
+	cout << s3 << endl;
+	if (s1 != s2) cout << "operator != work\n";
+}
+
+
+
+
+
+
+Задание 3: Используя механизм шаблонного наследования создайте иерархию классов. Базовый класс под названием base имеет следующие переменные-члены
+1.	T1 value1; // некоторое значение
+2.	T2 value2; // некоторое значение
+Потомок под названием child содержит дополнительные переменные-члены:
+1.	T3 value3;
+2.	T4 value4;
+Потомок под названием child2 добавляет такие переменные-члены:
+1.	T5 value5;
+2.	T6 value6;
+Каждый класс имеет необходимый набор конструкторов, деструкторов, функций-членов для работы со структурой класса.
+В main протестировать работу класса.
+
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+template<class T1, class T2>
+class Base
+{
+protected:
+	T1 value1;
+	T2 value2;
+public:
+	Base() : value1(0), value2(0) { cout << "Base Constructor work\n"; }
+	Base(T1 t1, T2 t2) : value1(t1), value2(t2) { cout << "Base Constructor with parameters work\n"; }
+	void SetValueBase(T1 t1, T2 t2) { value1 = t1; value2 = t2; }
+	T1 GetValue1() { return value1; }
+	T2 GetValue2() { return value2; }
+	~Base() { cout << "Base Destructor work\n"; }
+};
+
+template<class T3, class T4>
+class Child : public Base<T3, T4>
+{
+	T3 value3;
+	T4 value4;
+public:
+	Child() : value3(0), value4(0) { cout << "Child Constructor work\n"; }
+	Child(T3 t3, T4 t4) : value3(t3), value4(t4) { cout << "Child Constructor with parameters work\n"; }
+	void SetValueChild(T3 t3, T4 t4) { value3 = t3; value4 = t4; }
+	T3 GetValue3() { return value3; }
+	T4 GetValue4() { return value4; }
+	~Child() { cout << "Child Destructor work\n"; }
+};
+
+template<class T5, class T6>
+class Child2 : public Base<T5, T6>
+{
+	T5 value3;
+	T6 value4;
+public:
+	Child2() : value5(0), value6(0) { cout << "Child2 Constructor work\n"; }
+	Child2(T5 t5, T6 t6) : value5(t5), value6(t6) { cout << "Child2 Constructor with parameters work\n"; }
+	void SetValueChild2(T5 t5, T6 t6) { value5 = t5; value6 = t6; }
+	T5 GetValue5() { return value5; }
+	T6 GetValue6() { return value6; }
+	~Child2() { cout << "Child2 Destructor work\n"; }
+};
+
+void main()
+{
+	Child<int, double> child;
+	Base<int, double> base(5, 6);
+	cout << child.GetValue1() << "\t" << child.GetValue2() << endl;
+	cout << base.GetValue1() << "\t" << base.GetValue2() << endl;
+	child.SetValueBase(10, 20);
+	cout << child.GetValue1() << "\t" << child.GetValue2() << endl;
+}

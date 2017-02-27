@@ -1,0 +1,86 @@
+Реализовать кольцевой список. Сначала из двух элементов, потом добавить 7-15 элементов, в классе завести метод консолеоут (показать в консоли всю цепочку), 
+потом случайным образом удаляем по одному, пока не останется один и удаляем его (делаем метод с delete this).
+
+#include "stdafx.h"
+#include <iostream>
+class CS
+{
+protected:
+	int value;
+	CS* p_left = this;
+	CS* p_right = this;
+public:
+	CS()
+	{
+		value = rand()%10;
+	}
+	CS* GetLeft()
+	{
+		return p_left;
+	}
+	CS* GetRight()
+	{
+		return p_right;
+	}
+	void SetLeft(CS* const pNewLeft)
+	{
+		p_left = pNewLeft;
+	}
+	void SetRight(CS* const pNewRight)
+	{
+		p_right = pNewRight;
+	}
+	static void Connect(CS* first, CS* second)
+	{
+		first->SetLeft(second);
+		second->SetRight(first);
+	}
+
+	static void Insert(CS* fromHereToLeft, CS* whatToInsert)
+	{
+		CS* finalLeftOne = fromHereToLeft->p_left;
+		Connect(fromHereToLeft, whatToInsert);
+		Connect(whatToInsert, finalLeftOne);
+	}
+	static void Delete(CS* root)
+	{
+		Connect(root->p_right, root);
+		Connect(root->p_right, root->p_left);
+		delete root;
+	}
+	void ConsoleOut()
+	{
+		std::cout << value << "(" << p_left->value << "," << p_right->value << ")\n";
+	}
+	void DeleteLast()
+	{
+		delete this;
+	}
+};
+void Print(CS* root)
+{
+	CS* ptr = root;
+	do
+	{
+		ptr->ConsoleOut();
+		ptr = ptr->GetRight();
+	} while (ptr->GetRight() != root->GetRight());
+	std::cout << std::endl;
+}
+void main()
+{
+	CS* a = new CS;
+	CS* b = new CS;
+	CS::Connect(a, b);
+	CS::Connect(b, a);
+	for (int i = 0; i < 7; i++) CS::Insert(a, new CS);
+	Print(a);
+	
+	for (int i = 0; i < 8; i++)
+	{
+		CS::Delete(a->GetLeft());
+		Print(a);
+	}
+
+	a->DeleteLast();
+}

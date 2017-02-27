@@ -1,0 +1,215 @@
+Задание 1:
+Создайте класс Дробь (или используйте уже ранее созданный вами). Используя перегрузку операторов реализуйте для него арифметические операции для работы с дробями (операции +, -, *, /).
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Fraction
+{
+private:
+	int num;
+	int denum;
+public:
+	Fraction(int num, int denum)
+	{
+		this->num = num;
+		this->denum = denum;
+	}
+	Fraction operator+(Fraction obj)
+	{
+		Fraction temp(num*obj.denum + denum*obj.num, denum*obj.denum);
+		return temp;
+	}
+	Fraction operator-(Fraction obj)
+	{
+		Fraction temp(num*obj.denum - denum*obj.num, denum*obj.denum);
+		return temp;
+	}
+	Fraction operator*(Fraction obj)
+	{
+		Fraction temp(num*obj.num, denum*obj.denum);
+		return temp;
+	}
+	Fraction operator/(Fraction obj)
+	{
+		Fraction temp(num*obj.denum, denum*obj.num);
+		return temp;
+	}
+	int GetNum()
+	{
+		return num;
+	}
+	int GetDenum()
+	{
+		return denum;
+	}
+};
+void main()
+{
+	Fraction a(2, 3);
+	Fraction b(4, 5);
+	cout << "a = " << a.GetNum() << "/" << a.GetDenum() << "\t" << "b = " << b.GetNum() << "/" << b.GetDenum() << endl;
+	Fraction c = a + b;
+	cout << "Sum = " << c.GetNum() << "/" << c.GetDenum() << endl;
+	c = a - b;
+	cout << "Difference = " << c.GetNum() << "/" << c.GetDenum() << endl;
+	c = a * b;
+	cout << "Product = " << c.GetNum() << "/" << c.GetDenum() << endl;
+	c = a / b;
+	cout << "Quotient = " << c.GetNum() << "/" << c.GetDenum() << endl;
+}
+
+Задание 2: 
+Создайте класс Complex (комплексное число) или используйте уже созданный вами класс. Создайте перегруженные операторы для реализации арифметических операций для по работе с комплексными числами (операции +, -, *, /).
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Complex
+{
+private:
+	double re;
+	double im;
+public:
+	Complex(double re, double im)
+	{
+		this->re = re;
+		this->im = im;
+	}
+	Complex operator+(Complex obj)
+	{
+		Complex temp(re + obj.re, im + obj.im);
+		return temp;
+	}
+	Complex operator-(Complex obj)
+	{
+		Complex temp(re - obj.re, im - obj.im);
+		return temp;
+	}
+	Complex operator*(Complex obj)
+	{
+		Complex temp(re * obj.re - im * obj.im, im * obj.re + re * obj.im);
+		return temp;
+	}
+	Complex operator/(Complex obj)
+	{
+		Complex temp((re * obj.re + im * obj.im) / (obj.re * obj.re + obj.im * obj.im), (im * obj.re - re * obj.im) / (obj.re * obj.re + obj.im * obj.im));
+		return temp;
+	}
+	double GetRe()
+	{
+		return re;
+	}
+	double GetIm()
+	{
+		return im;
+	}
+};
+void main()
+{
+	Complex a(5, 7);
+	Complex b(3, 4);
+	cout << "a = " << a.GetRe() << "+" << a.GetIm() << "i\t" << "b = " << b.GetRe() << "+" << b.GetIm() << "i\n";
+	Complex c = a + b;
+	cout << "Sum = " << c.GetRe() << "+" << c.GetIm() << "i\n";
+	c = a - b;
+	cout << "Difference = " << c.GetRe() << "+" << c.GetIm() << "i\n";
+	c = a * b;
+	cout << "Product = " << c.GetRe() << "+" << c.GetIm() << "i\n";
+	c = a / b;
+	cout << "Quotient = " << c.GetRe() << "+" << c.GetIm() << "i\n";
+}
+
+Задание 3:
+Создать класс Overcoat (верхняя одежда)
+Реализовать перегруженные операторы:
+1.	Проверка на равенство типов одежды (операция = =)
+2.	Операцию присваивания одного объекта в другой (операция =)
+3.	Сравнение по цене двух пальто одного типа (операция>)
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Overcoat
+{
+private:
+	char *type;
+	int price;
+public:
+	Overcoat(char *type, int price)
+	{
+		this->type = type;
+		this->price = price;
+	}
+	bool operator==(const Overcoat &obj)
+	{
+		return type == obj.type;
+	}
+	Overcoat &operator=(const Overcoat &obj)
+	{
+		type = obj.type;
+		price = obj.price;
+		return *this;
+	}
+	bool operator>(const Overcoat &obj)
+	{
+		return price > obj.price;
+	}
+};
+void main()
+{
+	Overcoat adidas("kurtka", 100);
+	Overcoat reebok("puhovik", 120);
+	Overcoat nike("kurtka", 140);
+	if (adidas == nike) cout << "== work\n";
+	nike = reebok;
+	if (adidas == nike) cout << "== work\n";
+	if (reebok > adidas) cout << "> work\n";
+}
+
+Задание 4: 
+Создать класс Flat (квартира)
+Реализовать перегруженные операторы:
+1.	Проверка на равенство площадей квартир (операция ==)
+2.	Операцию присваивания одного объекта в другой (операция =)
+3.	Сравнение двух квартир по цене (операция>)
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Flat
+{
+private:
+	int area;
+	int price;
+public:
+	Flat(int area, int price)
+	{
+		this->area = area;
+		this->price = price;
+	}
+	bool operator==(const Flat &obj)
+	{
+		return area == obj.area;
+	}
+	Flat &operator=(const Flat &obj)
+	{
+		area = obj.area;
+		price = obj.price;
+		return *this;
+	}
+	bool operator>(const Flat &obj)
+	{
+		return price > obj.price;
+	}
+};
+void main()
+{
+	Flat flat1(40, 60000);
+	Flat flat2(60, 70000);
+	Flat flat3(40, 80000);
+	if (flat1 == flat3) cout << "== work\n";
+	flat3 = flat2;
+	if (flat1 == flat3) cout << "== work\n";
+	if (flat2 > flat1) cout << "> work\n";
+}

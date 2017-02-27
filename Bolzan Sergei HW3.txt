@@ -1,0 +1,189 @@
+﻿Задание 1:
+В ранее созданный класс String добавьте перегрузку[], (), преобразования типа к int
+[] – возвращает элемент по указанному индексу
+() – ищет символ в строке, если символ есть возвращает индекс, если нет -1
+Преобразование к int возвращает длину строки
+Реализуйте операцию инкеремента.Она должна увеличивать длину строки на единицу.Новый символ заполняется пробелом.
+Реализуйте операцию декремента.Она должна уменьшать длину строки на единицу.
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class String
+{
+	char *str;
+	int len;
+public:
+	String() : String(80){}
+	String(int lenght)
+	{
+		str = new char[lenght]; 
+	}
+	String(char *s)
+	{
+		len = strlen(s);
+		str = new char[len + 1];
+		strcpy_s(str, len + 1, s);
+	}
+	String(const String& s)
+	{
+		len = s.len;
+		str = new char[len + 1];
+		strcpy_s(str, len + 1, s.str);
+	}
+	~String()
+	{
+		delete[] str;
+	}
+	void Set()
+	{
+		char a[20];
+		cin.getline(a, 20);
+		int len = strlen(a) + 1;
+		str = new char[len];
+		strcpy_s(str, len, a);
+	}
+	char *Get()
+	{
+		return str;
+	}
+	char &operator[](int i)
+	{
+		return str[i];
+	}
+	int operator()(char i)
+	{
+		if (strchr(str, i)) return strlen(str) - strlen(strchr(str, i));
+		else return -1;
+	}
+	operator int()
+	{
+		return strlen(str);
+	}
+	String &operator++()
+	{
+		char *str1 = new char[strlen(str) + 2];
+		strcpy_s(str1, strlen(str) + 1, str);
+		strcat_s(str1, strlen(str1) + 2, " ");
+		delete[] str;
+		str = str1;
+		len++;
+		return *this;
+	}
+	String &operator--()
+	{
+		str[strlen(str) - 1] = '\0';
+		len--;
+		return *this;
+	}
+};
+
+void main()
+{
+	String stroka("Hello");
+	cout << stroka.Get() << endl;
+	cout << "Element po ukazannomu indeksu: " << stroka[4] << endl;
+	cout << "Poisk simvola: " << stroka('l') << endl;
+	int a = stroka;
+	cout << "Dlina stroki: " << a << endl;
+	stroka++;
+	cout << "Dlina stroki posle inkrementa: " << strlen(stroka.Get()) << endl;
+	stroka--;
+	cout << "Dlina stroki posle dekrementa: " << strlen(stroka.Get()) << endl;
+}
+
+
+
+
+Задание 2:
+В уже существующий класс Дробь добавьте перегрузку инкремента и декремента.
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+class Fraction
+{
+private:
+	int num;
+	int denum;
+public:
+	Fraction(int num, int denum)
+	{
+		this->num = num;
+		this->denum = denum;
+	}
+	Fraction operator+(Fraction obj)
+	{
+		Fraction temp(num*obj.denum + denum*obj.num, denum*obj.denum);
+		return temp;
+	}
+	Fraction operator-(Fraction obj)
+	{
+		Fraction temp(num*obj.denum - denum*obj.num, denum*obj.denum);
+		return temp;
+	}
+	Fraction operator*(Fraction obj)
+	{
+		Fraction temp(num*obj.num, denum*obj.denum);
+		return temp;
+	}
+	Fraction operator/(Fraction obj)
+	{
+		Fraction temp(num*obj.denum, denum*obj.num);
+		return temp;
+	}
+	int GetNum()
+	{
+		return num;
+	}
+	int GetDenum()
+	{
+		return denum;
+	}
+	Fraction& operator++()
+	{
+		num += denum;
+		return *this;
+	}
+	Fraction operator++(int)
+	{
+		Fraction temp = *this;
+		++*this;
+		return temp;
+	}
+	Fraction& operator--()
+	{
+		num -= denum;
+		return *this;
+	}
+	Fraction operator--(int)
+	{
+		Fraction temp = *this;
+		--*this;
+		return temp;
+	}
+	void Print()
+	{
+		cout << num << "/" << denum << endl;
+	}
+};
+void main()
+{
+	Fraction a(2, 3);
+	Fraction b(4, 5);
+	a = ++b;
+	a.Print();
+	b.Print();
+	cout << endl;
+	a = b++;
+	a.Print();
+	b.Print();
+	cout << endl;
+	a = --b;
+	a.Print();
+	b.Print();
+	cout << endl;
+	a = b--;
+	a.Print();
+	b.Print();
+}
