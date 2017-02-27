@@ -1,0 +1,100 @@
+﻿Реализовать умный указатель
+
+#include <iostream>
+#include <memory>
+class Test
+{
+public:
+	Test(){ std::cout << "+" << std::endl; }
+	~Test(){ std::cout << "-" << std::endl; }
+};
+
+template <typename T>
+class MyPtr
+{
+protected:
+	T* pType = nullptr;
+	size_t* counter = nullptr;
+public:
+	MyPtr(T* p = nullptr)
+	{
+		if (p != nullptr)
+		{
+			pType = p;
+			counter = new size_t(1);
+		}
+	}
+
+	void ReleaseOperation()
+	{
+		if (counter != nullptr)
+		{
+			--(*counter);
+			if (*counter == 0)
+			{
+				delete pType;
+				delete counter;
+			}
+			pType = nullptr;
+			counter = nullptr;
+		}
+	}
+	~MyPtr()
+	{
+		ReleaseOperation();
+	}
+
+	MyPtr(const MyPtr<T>& obj)
+	{
+		if (obj.counter != nullptr)
+		{
+			++(*obj.counter);
+			pType = obj.pType;
+			counter = obj.counter;
+		}
+	}
+	MyPtr<T>& operator = (const MyPtr<T>& obj)
+	{
+		if (obj.pType != pType)
+		{
+			ReleaseOperation();
+			if (obj.counter != nullptr)
+			{
+				++(*obj.counter);
+				pType = obj.pType;
+				counter = obj.counter;
+			}
+		}
+		return *this;
+	}
+
+	T& operator*() { return *ptr; }
+	T* operator->() { return ptr; }
+};
+
+void main()
+{
+	MyPtr<Test> p01; // создание пустого
+	MyPtr<Test> p05; // создание пустого
+	p05 = p01; // присваивание пустого от пустого
+
+
+	MyPtr<Test> p02(p01); // создание пустого от пустого
+
+	MyPtr<Test> p03(new Test); // сделали валидный объект
+
+	{
+		MyPtr<Test> p04(p03); // создали копию этого же объекта
+	}
+
+	p03 = p03; // присваивание самому себе
+
+
+
+	MyPtr<Test> p06(new Test);
+	p06 = p03; // присваивание одного другому
+	p03 = p06; // присваивание разных указателей на один объект
+
+	p03 = p05; // присваивание пустого в полный
+	p03 = p06; // присваивание полного в пустой
+}
